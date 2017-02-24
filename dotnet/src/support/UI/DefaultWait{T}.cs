@@ -177,7 +177,7 @@ namespace OpenQA.Selenium.Support.UI
                 }
                 catch (Exception ex)
                 {
-                    if (!this.IsIgnoredException(ex))
+                    if (!this.IsIgnoredException(ex) && !this.IsIgnoredException(ex.InnerException))
                     {
                         throw;
                     }
