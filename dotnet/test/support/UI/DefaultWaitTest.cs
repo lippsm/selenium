@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using NUnit.Framework;
 using NMock2;
@@ -86,6 +87,24 @@ namespace OpenQA.Selenium.Support.UI
             wait.Timeout = TimeSpan.FromMilliseconds(0);
             wait.PollingInterval = TimeSpan.FromSeconds(2);
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(NoSuchFrameException));
+
+            Assert.AreEqual(defaultReturnValue, wait.Until(condition));
+        }
+
+        [Test]
+        public void ShouldIgnoreInnerExceptions()
+        {
+            Exception ex = new TargetInvocationException("", new StaleElementReferenceException());
+            var condition = GetCondition(() => { throw ex; },
+                                         () => defaultReturnValue);
+
+            Expect.Once.On(mockClock).Method("LaterBy").With(TimeSpan.FromMilliseconds(0)).Will(Return.Value(startDate.Add(TimeSpan.FromSeconds(2))));
+            Expect.Once.On(mockClock).Method("IsNowBefore").With(startDate.Add(TimeSpan.FromSeconds(2))).Will(Return.Value(true));
+
+            IWait<IWebDriver> wait = new DefaultWait<IWebDriver>(mockDriver, mockClock);
+            wait.Timeout = TimeSpan.FromMilliseconds((0));
+            wait.PollingInterval = TimeSpan.FromSeconds(2);
+            wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
 
             Assert.AreEqual(defaultReturnValue, wait.Until(condition));
         }

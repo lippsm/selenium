@@ -216,7 +216,7 @@ namespace OpenQA.Selenium.Support.UI
 
         private bool IsIgnoredException(Exception exception)
         {
-            return this.ignoredExceptions.Any(type => type.IsAssignableFrom(exception.GetType()));
+            return this.ignoredExceptions.Any(type => type.IsAssignableFrom(exception?.GetType()));
         }
     }
 }
